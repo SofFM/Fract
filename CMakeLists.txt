@@ -1,18 +1,22 @@
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
-project(taskThree)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
+
+project(taskThree
+    VERSION 0.0.0
+    LANGUAGES CXX
+)
 
 set(SUBPROJECTS
-	${PROJECT_NAME}-windows
-	${PROJECT_NAME}-test
-	${PROJECT_NAME}-fractal
-	)
-	
+    taskThree-window
+    taskThree-test
+    taskThree-fractal
+)
+
 macro(find_package)
-	if(NOT "${ARGV0}" IN_LIST SUBPROJECTS)
-		_find_package(${ARGV0})
-	endif()
+    if(NOT "${ARGV0}" IN_LIST SUBPROJECTS)
+        _find_package(${ARGV})
+    endif()
 endmacro()
 
-foreach(subproj IN LISTS SUBPROJECTS)
-	add_subdirectory(${subproj})
+foreach(subdir IN LISTS SUBPROJECTS)
+    add_subdirectory(${subdir})
 endforeach()
