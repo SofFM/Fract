@@ -1,221 +1,79 @@
-#include <taskThree/window.hpp>
-
-namespace wn{                                                                  
-	
-	
-	Common::Common():
-		step(),
-		owners(),
-		data(nullptr)
-	{}
-	
-	
-	Common::~Common(){  
-		delete data;
-	}
-	
-	
-	Common::Common(std::size_t h_, std::size_t w_):
-		step(w_),
-		owners(1),
-		data(nullptr)
-	{
-		data= new bool[h_*w_]{};
-	}	
-	
-	
-		
-	Common::Common (const Common& info):
-		step(info.step),
-		owners(1),
-		data(nullptr)
-	{}	
-		
-		
-	Common::Common (Common&& info):
-		step(info.step),
-		owners(info.owners),
-		data(info.data)
-	{
-		info.data=nullptr;
-	}
-		
-	Common& Common::operator = (const Common& info){
-		step=info.step;
-		owners=1;
-		delete data;
-		data=nullptr;
-	}
-	
-	Common& Common::operator = (Common&& info){
-		step=info.step;
-		owners=info.owners;
-		delete data; 
-		data = info.data;
-		info.data= nullptr;
-	}
-
-	Common::Common(Window& window, std::size_t x, std::size_t y, std::size_t w): 
-        step(w),
-		data(window.start+y+x*window.info.step)
-	{
-         window.inc_owners();
-         owners=window.info.owners;
-    }
-	
-	
-	Window::Window():
-        h(),
-        w(),
-        info(),
-		start(info.data)
-    {}
+#ifndef WND_HPP
+#define WND_HPP
 
 
-   Window::Window(std::size_t h_, std::size_t w_):
-        h(h_),
-        w(w_),
-        info(h_,w_)
-    {}
-	
-	
+#include<cstddef>
+#include<ostream>
 
-    Window::Window(Window& window, std::size_t x, std::size_t y, std::size_t h_, std::size_t w_):
-        h(h_),
-        w(w_),
-        info(window,x,y,w),
-		start(info.data)
-    {}
-    
-	Window::Window (const Window& window):  
-		h(window.h),
-        w(window.w),
-        info(window.info),
-        start(nullptr)
-    {
-		info.data= new bool[h*w]{};
-		for (std::size_t i=0; i <h*w; ++i){
-			info.data[i]=window.info.data[i];
-		}
-		start=info.data;
-	}
+namespace wn{
+
+class Window;
+
+class Common{
+    friend class Window;
+    friend std::ostream& operator << (std::ostream& os, const Window& window);
+
+    std::size_t step;
+    std::size_t owners;
+    bool* data;
+
+    Common();
+
+    Common(std::size_t h_, std::size_t w_);
+
+    Common(Window& window, std::size_t x, std::size_t y, std::size_t w);
 
 
-    Window::Window(Window&& window):
-        h(window.h),
-        w(window.w),
-        info(static_cast<Common&&>(window.info)),
-		start(window.start)
-    {
-        window.info.data=nullptr;
-        window.start=nullptr;
-    }
+    Common (const Common& info);
+    Common (Common&& info);
+
+    Common& operator = (const Common& info);
+    Common& operator = (Common&& info);
 
 
-    Window& Window::operator =(const Window& window){
-        if (this!=&window){
-            h=window.h;
-			w=window.w;
-			info=window.info;
-            info.data= new bool[h*w]{};
-			for (std::size_t i=0; i< h*w; ++i){
-				info.data[i]=window.info.data[i];
-			}
-			
-			start=info.data;
-			
-        }
-		return *this;
-	}
+    ~Common();
+};
 
-    Window& Window::operator = (Window&& window){
-        if (this!=&window){
-            h=window.h;
-			w=window.w;
-			info=static_cast<Common&&>(window.info);
-            start=window.start;
-			window.start=nullptr;
-        }
-        
-		return *this;
-    }
+class Window{
+        friend class Common;
 
-    Window::~Window(){           // step owners bool* data // h,w, info , bool *start 
-        /*if (info.owners==1){
-			info.~Common();
-        }*/
-		start = nullptr;
-	}
+        std::size_t h;
+        std::size_t w;
+        Common info;
+        bool* start;
 
-    //Сравнивание двух окон на идентичность
-    bool Window::operator == (const Window& window) const{
-        if ((h != window.h) || (w != window.w)) {
-            return false;
-        } else {
-            for (std::size_t i = 0; i < h; ++i) {
-                for (std::size_t j = 0; j < w; ++j) {
-                    if (this->info.data[j + i * this->info.step] !=
-                        window.info.data[j + i * window.info.step]) {
-                        return false;
-                    }
-                }
-            }
-            return true;
-        }
-    }
+        void dec_owners();
+        void inc_owners();
 
-    std::ostream& operator << (std::ostream& s, const Window& window)
-    {
-        for (std::size_t i = 0; i < window.h; ++i) {
-            for (std::size_t j = 0; j < window.w; ++j) {
-                 s << (window.info.data[j + i * window.info.step] ? "# " : "  ");
-            }
-            s << '\n';
-        }
-        s << '\n';
-        return s;
-    }
+    public:
+        Window();
+        Window(std::size_t h_, std::size_t w_);
+
+        Window (const Window& window);
+        Window (Window&& window);
+
+        Window (Window& window, std::size_t x, std::size_t y, std::size_t h_, std::size_t w_);
 
 
-    bool Window::operator () (std::size_t x, std::size_t y) const {
-        return this->info.data[y+x*this->info.step];
+        ~Window();
 
-    }
+        friend std::ostream& operator << (std::ostream& os, const Window& window);
 
-    bool& Window::operator () (std::size_t x, std::size_t y){
-        bool& value=this->info.data[y+x*this->info.step];
-        return value;
+        Window& operator = (const Window& window);
 
-    }
+        Window& operator = (Window&& window);
 
-    Window::operator bool() const{
-        bool kek = info.data!=nullptr;
+        bool operator == (const Window& window) const;
 
-        return info.data!=nullptr;
-    }
+        bool operator () (std::size_t x, std::size_t y) const;
 
-    std::size_t Window::get_height() const {
-        return  h;
-    }
+        bool& operator () (std::size_t x, std::size_t y);
 
-    std::size_t Window::get_width() const {
-        return w;
-    }
+        explicit operator bool() const;
 
-    std::size_t Window::check_owners() const{
-        return info.owners;
-    }
-
-
-    void Window::dec_owners(){
-        --info.owners;
-        return;
-    }
-    
-	void Window::inc_owners(){
-        ++info.owners;
-        return;
-    }
-
-
+        std::size_t get_width() const;
+        std::size_t get_height() const;
+        std::size_t check_owners() const;
+};
 }
+#endif // WND_HPP
