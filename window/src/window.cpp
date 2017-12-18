@@ -1,9 +1,9 @@
-#include "window.hpp"
+#include <taskThree/window.hpp>
 
 namespace wn{                                                                  
 	
 	
-	COmmon::Common():
+	Common::Common():
 		step(),
 		owners(),
 		data(nullptr)
@@ -16,7 +16,7 @@ namespace wn{
 	
 	
 	Common::Common(std::size_t h_, std::size_t w_):
-		step(w),
+		step(w_),
 		owners(1),
 		data(nullptr)
 	{
@@ -56,11 +56,11 @@ namespace wn{
 	}
 
 	Common::Common(Window& window, std::size_t x, std::size_t y, std::size_t w): 
-		step(w),
-		owners(),
+        step(w),
 		data(window.start+y+x*window.info.step)
 	{
-		 owners=window.inc_owners();
+         window.inc_owners();
+         owners=window.info.owners;
     }
 	
 	
@@ -83,7 +83,7 @@ namespace wn{
     Window::Window(Window& window, std::size_t x, std::size_t y, std::size_t h_, std::size_t w_):
         h(h_),
         w(w_),
-        info(window,x,y,w)
+        info(window,x,y,w),
 		start(info.data)
     {}
     
@@ -107,8 +107,8 @@ namespace wn{
         info(static_cast<Common&&>(window.info)),
 		start(window.start)
     {
-        window.data=nullptr;
-		window.stat=nullptr;
+        window.info.data=nullptr;
+        window.start=nullptr;
     }
 
 
@@ -117,7 +117,7 @@ namespace wn{
             h=window.h;
 			w=window.w;
 			info=window.info;
-			data= new bool[h*w]{};
+            info.data= new bool[h*w]{};
 			for (std::size_t i=0; i< h*w; ++i){
 				info.data[i]=window.info.data[i];
 			}
@@ -133,7 +133,7 @@ namespace wn{
             h=window.h;
 			w=window.w;
 			info=static_cast<Common&&>(window.info);
-			statr=window.start;
+            start=window.start;
 			window.start=nullptr;
         }
         
@@ -141,9 +141,9 @@ namespace wn{
     }
 
     Window::~Window(){           // step owners bool* data // h,w, info , bool *start 
-		if (info.owners==1){
+        /*if (info.owners==1){
 			info.~Common();
-		}
+        }*/
 		start = nullptr;
 	}
 
@@ -189,6 +189,8 @@ namespace wn{
     }
 
     Window::operator bool() const{
+        bool kek = info.data!=nullptr;
+
         return info.data!=nullptr;
     }
 
@@ -217,6 +219,3 @@ namespace wn{
 
 
 }
-
-
-
