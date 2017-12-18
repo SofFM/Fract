@@ -1,13 +1,18 @@
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
+cmake_minimum_required(VERSION 3.8 FATAL_ERROR)
 
 set(NAMESPACE taskThree)
 set(COMPONENT window)
-project(${NAMESPACE}-${COMPONENT})
+project(${NAMESPACE}-${COMPONENT}
+    VERSION 0.0.0
+    LANGUAGES CXX
+)
 
-add_executable(${PROJECT_NAME} window.cpp)
-add_executable(${NAMESPACE}::${COMPONENT} ALIAS ${PROJECT_NAME})
+add_library(${PROJECT_NAME}
+    include/${NAMESPACE}/window.hpp
+    src/window.cpp
+)
 
-target_include_directories($(PROJECT_NAME} PUBLICK ${CMAKE_CURRENT_SOURCE_DIR})
-
-#target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+
+target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>")
