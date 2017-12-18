@@ -1,11 +1,21 @@
-cmake_minimum_required(VERSION 3.6 FATAL_ERROR)
-
 set(NAMESPACE taskThree)
 set(COMPONENT test)
-project(${NAMESPACE}-${COMPONENT})
+project(${NAMESPACE}-${COMPONENT}
+    VERSION 0.0.0
+    LANGUAGES CXX
+)
 
-add_executable(${PROJECT_NAME} test.cpp)
-add_executable(${NAMESPACE}::${COMPONENT} ALIAS ${PROJECT_NAME})
+add_executable(${PROJECT_NAME}
+    src/main.cpp
+)
 
-find_package(taskThree-window)
-target_link_libraries(${PROJECT_NAME} PRIVATE taskThree::window)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
+set_target_properties(${PROJECT_NAME} PROPERTIES CXX_EXTENSIONS OFF)
+
+find_package(taskThree-window 0.0.0 REQUIRED)
+target_link_libraries(${PROJECT_NAME} taskThree-window)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_test(NAME test COMMAND est)
+endif()
