@@ -1,5 +1,5 @@
 #include <iostream>
-#include "window.hpp"
+#include <taskThree/window.hpp>
 
 std::size_t bin_pow(std::size_t a, std::size_t n) {
    int res = 1;
@@ -15,7 +15,7 @@ std::size_t bin_pow(std::size_t a, std::size_t n) {
 void build_fractal(wn::Window& fractal, std::size_t N, wn::Window& pat){
 	
 	struct Data {
-		wn:Window win;
+		wn::Window win;
 		std::size_t level;
 	};
 	
@@ -25,7 +25,7 @@ void build_fractal(wn::Window& fractal, std::size_t N, wn::Window& pat){
 	std::size_t count{}; //the number of windows that will be opened due to pattern
 	
 	for(std::size_t i = 0; i < h*w; ++i){
-		if(pat(i / w, i % w){
+        if(pat(i / w, i % w)){
 			++count;
 		}
 	}
@@ -36,14 +36,14 @@ void build_fractal(wn::Window& fractal, std::size_t N, wn::Window& pat){
 	for (std::size_t j=0; j<h*w; ++j){
 		while (count){
 			for(std::size_t i = 0; i < h*w; ++i){
-				if(pat(i / w, i % w){
-					wins[i].win= sub_win(fractal,
-					(i/ w) * bin_pow(h, N - level)+(j/w)*(bin_pow(h,level), // y coordinate
+                if(pat(i / w, i % w)){
+                    wins[i].win= wn::Window(fractal,
+                    (i/ w) * bin_pow(h, N - level)+(j/w)*bin_pow(h,level), // y coordinate
 					(i % w ) * bin_pow(w , N - level)+(j%w)*bin_pow(w,level), // x coordinate
-					bin_pow(h, N - level), bin_pow(w , N - level));
-					wuns[i].level=level;
+                    bin_pow(h, N - level), bin_pow(w , N - level));
+                    wins[i].level=level;
 					if (level==N-1) {
-						wins[i].win=pattern;
+                        wins[i].win=pat;
 					}
 					--count;
 				}
@@ -56,11 +56,7 @@ void build_fractal(wn::Window& fractal, std::size_t N, wn::Window& pat){
 	return;
 }
 
-
-void tests();
-
 int main(){
-    tests();
     std::size_t h,w,N;
 
     std::cout << "Input N: ";
@@ -115,9 +111,8 @@ int main(){
     } 
 	else { 
 		wn::Window fractal(bin_pow(h,N),bin_pow(w,N));
-		build_fractal(fractal, N, pat);
+        build_fractal(fractal, N, pattern);
 		std::cout<<fractal<<'\n';
 	}
     return 0;
 }
-
