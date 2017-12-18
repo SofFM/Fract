@@ -51,8 +51,6 @@ void build_fractal(wn::Window& fractal, std::size_t N, wn::Window& pat){
 			++level;
 		}
 	}
-	
-    
 	return;
 }
 
